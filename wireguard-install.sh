@@ -152,11 +152,14 @@ function installQuestions() {
 		fi
 	done
 
+	# Extract subnet from SERVER_WG_IPV4
+	SERVER_SUBNET=$(echo $SERVER_WG_IPV4 | cut -d. -f1-3)".0/24"
+
 	until [[ ${ALLOWED_IPS} =~ ^.+$ ]]; do
 		echo -e "\nWireGuard uses a parameter called AllowedIPs to determine what is routed over the VPN."
-		read -rp "Allowed IPs list for generated clients (leave default to route everything): " -e -i '0.0.0.0/0,::/0' ALLOWED_IPS
+		read -rp "Allowed IPs list for generated clients (default is the WireGuard subnet): " -e -i "${SERVER_SUBNET}" ALLOWED_IPS
 		if [[ ${ALLOWED_IPS} == "" ]]; then
-			ALLOWED_IPS="0.0.0.0/0,::/0"
+			ALLOWED_IPS="${SERVER_SUBNET}"
 		fi
 	done
 
